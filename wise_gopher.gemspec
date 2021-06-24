@@ -9,7 +9,12 @@ Gem::Specification.new do |spec|
   spec.email         = ["pagehey@pm.me"]
 
   spec.summary       = "Encapsulate raw SQL queries and return results as plain Ruby objects, using ActiveRecord."
-  spec.description   = 'Instead of using `ActiveRecord::Base.connection.execute("some raw sql ...")`, use WiseGopher to delcare your queries as classes, ensure sql injection protection and retrieve results as plain Ruby object with dedicated class instead of raw values in hashes or arrays.'
+  spec.description   = <<~STR
+    Instead of using `ActiveRecord::Base.connection.execute("some raw sql ...")`,
+    use WiseGopher to delcare your queries as classes,
+    ensure sql injection protection
+    and retrieve results as plain Ruby object with dedicated class instead of raw values in hashes or arrays.
+  STR
   spec.homepage      = "https://github.com/Pagehey/wise_gopher"
   spec.license       = "MIT"
   spec.required_ruby_version = ">= 2.5.0"
