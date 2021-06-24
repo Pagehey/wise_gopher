@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'Instead of using `ActiveRecord::Base.connection.execute("some raw sql ...")`, use WiseGopher to delcare your queries as classes, ensure sql injection protection and retrieve results as plain Ruby object with dedicated class instead of raw values in hashes or arrays.'
   spec.homepage      = "https://github.com/Pagehey/wise_gopher"
   spec.license       = "MIT"
-  spec.required_ruby_version = ">= 2.4.0"
+  spec.required_ruby_version = ">= 2.5.0"
 
   spec.metadata["allowed_push_host"] = "https://github.com/Pagehey/wise_gopher"
 
