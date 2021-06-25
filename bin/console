@@ -13,6 +13,7 @@ require "wise_gopher"
 
 require "irb"
 
+# helper to have a database available from scratch in the console
 class Object
   private
 
