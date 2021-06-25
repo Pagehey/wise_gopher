@@ -12,4 +12,29 @@ require "wise_gopher"
 # Pry.start
 
 require "irb"
+
+class Object
+  private
+
+  def connection
+    @connection ||= begin
+      ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
+
+      populate_database
+
+      ActiveRecord::Base.connection
+    end
+  end
+
+  def populate_database
+    ActiveRecord::Migration.create_table :posts do |t|
+      t.string :title
+    end
+
+    ActiveRecord::Base.connection.execute(<<-SQL)
+      INSERT INTO posts (title) VALUES ('First Post'), ('Second Post')
+    SQL
+  end
+end
+
 IRB.start(__FILE__)
