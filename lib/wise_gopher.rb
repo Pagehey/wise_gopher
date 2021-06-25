@@ -2,7 +2,8 @@
 
 require_relative "wise_gopher/version"
 
+require "active_record"
+
 module WiseGopher
   class Error < StandardError; end
-  # Your code goes here...
 end
