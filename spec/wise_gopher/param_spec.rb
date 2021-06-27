@@ -6,7 +6,7 @@ RSpec.describe WiseGopher::Param do # rubocop:disable Metrics/BlockLength
     let(:bind)  { param.build_bind(DateTime.new(2021, 1, 1, 10, 30)) }
 
     it "returns an ActiveRecord::Relation::QueryAttribute" do
-      expect(param).to be_a ActiveRecord::Relation::QueryAttribute
+      expect(bind).to be_a ActiveRecord::Relation::QueryAttribute
     end
 
     it "has correct name and type" do
@@ -26,7 +26,7 @@ RSpec.describe WiseGopher::Param do # rubocop:disable Metrics/BlockLength
 
     context "when transform is given" do
       let(:param) { described_class.new(:rating, :integer, ->(rating) { rating.clamp(0, 10) }) }
-      let(:bind)  { param.build_bind("314") }
+      let(:bind)  { param.build_bind(314) }
 
       it "has correct value" do
         expect(bind.value_for_database).to eq(10)
