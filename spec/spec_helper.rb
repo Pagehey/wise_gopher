@@ -2,9 +2,27 @@
 
 require "wise_gopher"
 
+require "database_cleaner"
+
+require_relative "database_helper"
+
+DatabaseCleaner.strategy = :transaction
+
 RSpec.configure do |config|
+  include DatabaseHelper
+
   config.before :suite do
-    ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
+    establish_connection # from database_helper
+
+    create_articles_table # from database_helper
+  end
+
+  config.before do
+    DatabaseCleaner.start
+  end
+
+  config.after do
+    DatabaseCleaner.clean
   end
 
   # Enable flags like --only-failures and --next-failure
