@@ -3,13 +3,12 @@
 module WiseGopher
   # Cast query columns and transform value
   class Column
-    attr_reader :name, :type, :column_name
+    attr_reader :name, :type, :alias
 
-    def initialize(column_name, type_symbol, after_cast: nil, as: nil)
-      @name        = as&.to_s || column_name.to_s
-      @column_name = column_name.to_s
+    def initialize(name, type_symbol, after_cast: nil, as: nil)
+      @alias       = as&.to_s || name.to_s
+      @name        = name.to_s
       @type        = ActiveRecord::Type.lookup type_symbol
-      @alias       = as
       @after_cast  = after_cast&.to_proc
     end
 
@@ -17,6 +16,18 @@ module WiseGopher
       casted_value = @type.deserialize(value)
 
       @after_cast ? transform_value(casted_value) : casted_value
+    end
+
+    def define_getter(row_class)
+      column = self
+
+      row_class.define_method(@alias) do
+        instance_variable_get(column.instance_variable_name)
+      end
+    end
+
+    def instance_variable_name
+      @instance_variable_name ||= "@#{@alias.tr("?!", "")}".freeze
     end
 
     private

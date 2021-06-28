@@ -42,4 +42,26 @@ RSpec.describe WiseGopher::Column do # rubocop:disable Metrics/BlockLength
       end
     end
   end
+
+  describe "::define_getter" do
+    let(:row_class)        { Class.new { include WiseGopher::Row } }
+    let(:row)              { row_class.new({ "title" => "Dragons are real!", "rating" => "9999" }) }
+    let(:string_column)    { described_class.new(:title, :string) }
+    let(:integer_column)   { described_class.new(:rating, :integer, as: :how_much_vegeta?) }
+
+    before do
+      string_column.define_getter(row_class)
+      integer_column.define_getter(row_class)
+
+      row_class.columns[string_column.name]  = string_column
+      row_class.columns[integer_column.name] = integer_column
+    end
+
+    it "creates a getter on row class" do
+      expect(row_class.instance_methods(false)).to include(:title)
+      expect(row_class.instance_methods(false)).to include(:how_much_vegeta?)
+      expect(row.title).to                         eq("Dragons are real!")
+      expect(row.how_much_vegeta?).to              be > 9000
+    end
+  end
 end
