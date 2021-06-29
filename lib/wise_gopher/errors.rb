@@ -11,15 +11,15 @@ module WiseGopher
 
     def initialize(params)
       @params = params.map do |name, param|
-        "\"#{name}\" (#{param.type.type})"
-      end.join(", ")
+        "- \"#{name}\" (#{param.type.type})"
+      end.join("\n")
     end
 
     def message
-      <<-STR
-      \n
-      The following param are declared in query but were not passed as arguments:
-      #{params}
+      <<~STR
+        \n
+        The following params are required but were not provided:
+        #{params}
       STR
     end
   end
@@ -30,26 +30,27 @@ module WiseGopher
 
     def initialize(column_names)
       @column_names = column_names.map do |name|
-        "\"#{name}\""
-      end.join(", ")
+        "- \"#{name}\""
+      end.join("\n")
     end
 
     def message
-      <<-STR
-      \n
-      The following columns where found but were not declared: #{column_names}
+      <<~STR
+        \n
+        The following columns where found in result but were not declared:
+        #{column_names}
 
-      If you need them during query execution but not in result,
-      you should use row's `ignore` method, like this:
+        If you need them during query execution but not in result,
+        you should ignore them, like this:
 
-      class Query < WiseGopher::Base
-        query "SELECT title, rating FROM articles"
+        class Query < WiseGopher::Base
+          query "SELECT title, rating FROM articles"
 
-        row do
-          column :title, :string
-          ignore :rating
+          row do
+            column :title, :string
+            ignore :rating
+          end
         end
-      end
       STR
     end
   end

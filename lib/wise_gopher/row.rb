@@ -22,7 +22,7 @@ module WiseGopher
 
         column.define_getter(self)
 
-        columns[column.name] = WiseGopher::Column.new(name, type, **kwargs)
+        columns[column.name] = column
       end
 
       def ignore(column_name)

@@ -2,11 +2,8 @@
 
 RSpec.describe WiseGopher::Row do # rubocop:disable Metrics/BlockLength
   describe "::columns" do
-    let(:row_class) do
-      Class.new { include WiseGopher::Row }
-    end
-
-    let(:columns) { row_class.columns }
+    let(:row_class) { Class.new.include described_class }
+    let(:columns)   { row_class.columns }
 
     before do
       row_class.column :title,  :string, after_cast: :capitalize!
@@ -27,11 +24,8 @@ RSpec.describe WiseGopher::Row do # rubocop:disable Metrics/BlockLength
   end
 
   describe "::column" do
-    let(:row_class) do
-      Class.new { include WiseGopher::Row }
-    end
-
-    let(:column) { row_class.instance_variable_get("@columns").values.first }
+    let(:row_class) { Class.new.include described_class }
+    let(:column)    { row_class.instance_variable_get("@columns").values.first }
 
     before do
       row_class.column :title, :string, as: :capitalized_title, after_cast: :capitalize!
@@ -48,9 +42,7 @@ RSpec.describe WiseGopher::Row do # rubocop:disable Metrics/BlockLength
   end
 
   describe "::ignore" do
-    let(:row_class) do
-      Class.new { include WiseGopher::Row }
-    end
+    let(:row_class) { Class.new.include described_class }
 
     before do
       row_class.ignore(:rating)
@@ -62,16 +54,13 @@ RSpec.describe WiseGopher::Row do # rubocop:disable Metrics/BlockLength
   end
 
   describe "::new" do
+    let(:row_class) { Class.new.include described_class }
+    let(:row)       { row_class.new({ "title" => "Dragons are real!", "rating" => "9999" }) }
+
     before do
       row_class.column(:title,  :string)
       row_class.column(:rating, :integer, as: :how_much_vegeta?)
     end
-
-    let(:row_class) do
-      Class.new { include WiseGopher::Row }
-    end
-
-    let(:row) { row_class.new({ "title" => "Dragons are real!", "rating" => "9999" }) }
 
     it "returns a row instance with columns as getters" do
       expect(row.title).to            eq("Dragons are real!")
