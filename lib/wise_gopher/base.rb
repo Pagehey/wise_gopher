@@ -32,7 +32,7 @@ module WiseGopher
 
         @row_class.include WiseGopher::Row
 
-        @row_class.instance_exec(&block) if block_given?
+        @row_class.class_eval(&block) if block_given?
       end
 
       def execute
