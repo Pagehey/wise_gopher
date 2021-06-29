@@ -57,6 +57,10 @@ module WiseGopher
   # raised when row is not declared or not given
   class RowClassIsMissing < Error
   end
+
+  # raised when custom row class is given but doesn't include WiseGopher::Row
+  class RowClassNeedsRowModule < Error
+  end
 end
 
 # connection;

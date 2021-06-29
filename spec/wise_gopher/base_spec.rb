@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe WiseGopher::Base do # rubocop:disable Metrics/BlockLength
+# rubocop:disable Metrics/BlockLength
+
+RSpec.describe WiseGopher::Base do
   describe "::query" do
     let(:query) do
       <<-SQL
@@ -43,7 +45,67 @@ RSpec.describe WiseGopher::Base do # rubocop:disable Metrics/BlockLength
     end
   end
 
-  describe "::execute" do # rubocop:disable Metrics/BlockLength
+  describe "::row" do
+    context "when no custom class is given" do
+      let(:query_class) do
+        stub_const("ArticleQuery", Class.new(described_class))
+      end
+
+      before do
+        query_class.row do
+          column :title, :string
+        end
+      end
+
+      it "dynamically creates a row class an runs block against it" do
+        expect(defined? query_class::Row).to       be_truthy
+        expect(query_class::Row.columns.length).to eq(1)
+      end
+    end
+
+    context "when custom class is given" do
+      before do
+        stub_const("CustomRowClass", Class.new)
+      end
+
+      context "when block is given" do
+        let(:query_class) do
+          stub_const("ArticleQuery", Class.new(described_class))
+        end
+
+        before do
+          query_class.row CustomRowClass do
+            column :title, :string
+          end
+        end
+
+        it "evaluates block against given class" do
+          expect(CustomRowClass.ancestors).to                 include(WiseGopher::Row)
+          expect(CustomRowClass.columns.length).to            eq(1)
+          expect(CustomRowClass.columns.values.first.name).to eq("title")
+        end
+      end
+
+      context "when no block is given" do
+        let(:query_class)      { stub_const("ArticleQuery", Class.new(described_class)) }
+        let(:custom_row_class) { stub_const("CustomRowClass", Class.new) }
+
+        before { query_class.row custom_row_class }
+
+        it "registers the custom row class" do
+          internal_row_class = query_class.instance_variable_get("@row_class")
+
+          expect(internal_row_class).to eq(custom_row_class)
+        end
+
+        it "doesn't dynamically create a row class" do
+          expect(defined? ArticleQuery::Row).to be_falsy
+        end
+      end
+    end
+  end
+
+  describe "::execute" do
     context "when result contains more columns than declared" do
       let(:query_class) do
         query_class = Class.new(described_class) do
@@ -123,7 +185,7 @@ RSpec.describe WiseGopher::Base do # rubocop:disable Metrics/BlockLength
       end
     end
 
-    context "when class is correctly declared" do # rubocop:disable Metrics/BlockLength
+    context "when class is correctly declared" do
       let(:query_class) do
         query_class = Class.new(described_class) do
           query <<-SQL
@@ -162,7 +224,7 @@ RSpec.describe WiseGopher::Base do # rubocop:disable Metrics/BlockLength
     end
   end
 
-  describe "::execute_with" do # rubocop:disable Metrics/BlockLength
+  describe "::execute_with" do
     let(:query_class) do
       query_class = Class.new(described_class) do
         query <<-SQL
@@ -212,7 +274,7 @@ RSpec.describe WiseGopher::Base do # rubocop:disable Metrics/BlockLength
     end
   end
 
-  describe ".prepare_query" do # rubocop:disable Metrics/BlockLength
+  describe ".prepare_query" do
     let(:query_class) do
       query_class = Class.new(described_class) do
         query <<-SQL
@@ -268,3 +330,5 @@ RSpec.describe WiseGopher::Base do # rubocop:disable Metrics/BlockLength
     end
   end
 end
+
+# rubocop:enable Metrics/BlockLength

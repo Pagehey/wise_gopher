@@ -30,6 +30,8 @@ module WiseGopher
       def row(base = nil, &block)
         @row_class ||= base || define_generic_row_class
 
+        @row_class.include WiseGopher::Row
+
         @row_class.instance_exec(&block) if block_given?
       end
 
@@ -46,11 +48,7 @@ module WiseGopher
       private
 
       def define_generic_row_class
-        query_class = Class.new do
-          include WiseGopher::Row
-        end
-
-        @row_class = const_set "Row", query_class
+        @row_class = const_set "Row", Class.new
       end
 
       def ensure_all_params_are_given(inputs)

@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-RSpec.describe WiseGopher::Column do # rubocop:disable Metrics/BlockLength
-  describe "#cast" do # rubocop:disable Metrics/BlockLength
+# rubocop:disable Metrics/BlockLength
+
+RSpec.describe WiseGopher::Column do
+  describe "#cast" do
     context "when transform is not given" do
       let(:string_column)  { described_class.new(:title, :string) }
       let(:integer_column) { described_class.new(:rating, :integer) }
@@ -65,3 +67,5 @@ RSpec.describe WiseGopher::Column do # rubocop:disable Metrics/BlockLength
     end
   end
 end
+
+# rubocop:enable Metrics/BlockLength
