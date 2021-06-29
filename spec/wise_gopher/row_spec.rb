@@ -68,14 +68,14 @@ RSpec.describe WiseGopher::Row do # rubocop:disable Metrics/BlockLength
 
     it "returns all registered columns" do
       expect(columns.length).to          eq(2)
-      expect(columns['title'].name).to   eq("title")
-      expect(columns['title'].alias).to  eq("title")
-      expect(columns['rating'].name).to  eq("rating")
-      expect(columns['rating'].alias).to eq("average_rating")
+      expect(columns["title"].name).to   eq("title")
+      expect(columns["title"].alias).to  eq("title")
+      expect(columns["rating"].name).to  eq("rating")
+      expect(columns["rating"].alias).to eq("average_rating")
     end
 
     it "returns registed columns as Column objects" do
-      expect(columns['title']).to be_a(WiseGopher::Column)
+      expect(columns["title"]).to be_a(WiseGopher::Column)
     end
   end
 
@@ -97,6 +97,20 @@ RSpec.describe WiseGopher::Row do # rubocop:disable Metrics/BlockLength
       expect(column.name).to      eq("title")
       expect(column.alias).to     eq("capitalized_title")
       expect(column.type.type).to eq(:string)
+    end
+  end
+
+  describe "::ignore" do
+    let(:row_class) do
+      Class.new { include WiseGopher::Row }
+    end
+
+    before do
+      row_class.ignore(:rating)
+    end
+
+    it "adds column to ignore in result" do
+      expect(row_class.ignored_columns).to eq(["rating"])
     end
   end
 
