@@ -21,8 +21,8 @@ module WiseGopher
         const_set "QUERY", query.freeze
       end
 
-      def param(name, type, before_cast = nil)
-        param = WiseGopher::Param.new(name, type, before_cast)
+      def param(name, type, transform = nil)
+        param = WiseGopher::Param.new(name, type, transform)
 
         params[param.name] = param
       end

@@ -6,7 +6,7 @@ RSpec.describe WiseGopher::Row do # rubocop:disable Metrics/BlockLength
     let(:columns)   { row_class.columns }
 
     before do
-      row_class.column :title,  :string, after_cast: :capitalize!
+      row_class.column :title,  :string, transform: :capitalize
       row_class.column :rating, :integer, as: :average_rating
     end
 
@@ -28,7 +28,7 @@ RSpec.describe WiseGopher::Row do # rubocop:disable Metrics/BlockLength
     let(:column)    { row_class.instance_variable_get("@columns").values.first }
 
     before do
-      row_class.column :title, :string, as: :capitalized_title, after_cast: :capitalize!
+      row_class.column :title, :string, as: :capitalized_title, transform: :capitalize
     end
 
     it "registers a column expected in result" do

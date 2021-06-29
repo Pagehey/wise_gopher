@@ -17,7 +17,7 @@ RSpec.describe WiseGopher::Column do
 
     context "when tranform is given" do
       context "when transform is given as method_name" do
-        let(:column) { described_class.new(:title, :string, after_cast: :capitalize!) }
+        let(:column) { described_class.new(:title, :string, transform: :capitalize) }
 
         it "casts a value according to column type and transform method" do
           expect(column.cast("gandalf")).to be_a(String)
@@ -26,7 +26,7 @@ RSpec.describe WiseGopher::Column do
       end
 
       context "when transform is given as a block (with arity 0)" do
-        let(:column) { described_class.new(:title, :string, after_cast: -> { capitalize! }) }
+        let(:column) { described_class.new(:title, :string, transform: -> { capitalize }) }
 
         it "casts a value according to column type and transform method" do
           expect(column.cast("gandalf")).to be_a(String)
@@ -35,7 +35,7 @@ RSpec.describe WiseGopher::Column do
       end
 
       context "when transform is given as a block (with arity 1)" do
-        let(:column) { described_class.new(:title, :string, after_cast: ->(value) { value.capitalize! }) }
+        let(:column) { described_class.new(:title, :string, transform: ->(value) { value.capitalize }) }
 
         it "casts a value according to column type and transform method" do
           expect(column.cast("gandalf")).to be_a(String)
