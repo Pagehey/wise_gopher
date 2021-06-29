@@ -78,7 +78,7 @@ module WiseGopher
       def execute
         ensure_row_class_is_declared
 
-        result = connection.exec_query(@query.squish, query_class.to_s, @binds)
+        result = connection.exec_query(@query.squish, query_class.to_s, @binds, prepare: true)
 
         ensure_all_columns_are_declared(result)
 
