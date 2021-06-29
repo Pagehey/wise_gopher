@@ -8,3 +8,10 @@ require_relative "wise_gopher/row"
 require_relative "wise_gopher/errors"
 
 require "active_record"
+
+# base module
+module WiseGopher
+  def self.postgresql?
+    ActiveRecord::Base.connection.adapter_name.casecmp? "PostgreSQL"
+  end
+end
