@@ -231,7 +231,7 @@ class MyQuery < WiseGopher::Base
 end
 
 MyQuery.execute_with(ratings: [1, 2])
-# query will be "SELECT title FROM articles WHERE rating in (1, 2)"
+# query will be "SELECT title FROM articles WHERE rating in (?, ?)"
 ```
 
 ------
