@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["PageHey"]
   spec.email         = ["pagehey@pm.me"]
 
-  spec.summary       = "Encapsulate raw SQL queries and return results as plain Ruby objects, using ActiveRecord."
+  spec.summary       = "Encapsulate raw SQL queries and return result as plain Ruby objects, using ActiveRecord."
   spec.description   = <<~STR
     Instead of using `ActiveRecord::Base.connection.execute("some raw sql ...")`,
     use WiseGopher to delcare your queries as classes,
