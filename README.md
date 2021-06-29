@@ -1,8 +1,20 @@
 # WiseGopher
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/wise_gopher`. To experiment with that code, run `bin/console` for an interactive prompt.
+Why is the gopher wise ? Because it knows one should not use raw SQL with ActiveRecord without being mindful about security and performance !
 
-TODO: Delete this and the text above, and describe your gem
+This gem tries to solve some problems found when ActiveRecord query builder is not enough for the SQL you need to run and you have to use [`exec_query`](https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/DatabaseStatements.html#method-i-exec_query):
+
+1. ActiveRecord doesn't make it easy to use bind parameters. It needs a lot of build up to pass arguments for your query.
+2. The result of query is return as an array of hashes wich deprive us of good old OOP.
+3. The column types are not always correctly retrieved by ActiveRecord, or sometimes you need a little more ruby treatment on the value before using it.
+
+[This article](https://blog.saeloun.com/2019/10/28/bind-parameters-in-activerecord-sql-queries.html) describe the benefits of using bind parameters with ActiveRecord.
+
+The basic idea of this gem is to provide you a way to declare what your query needs as input, what columns it returns and their type. In returns it will allow you to retrieve the rows from result as an array of plain Ruby objects. It will also dynamically creates a class for the row objects that you can customize or can provide it yourself.
+
+NB : This is my very first gem, any suggestions, feedbacks or bug reports are very welcome ! 😃
+
+------
 
 ## Installation
 
@@ -14,21 +26,19 @@ gem 'wise_gopher'
 
 And then execute:
 
-    $ bundle install
+    bundle install
 
 Or install it yourself as:
 
-    $ gem install wise_gopher
+    gem install wise_gopher
+
+------
 
 ## Usage
 
 TODO: Write usage instructions here
 
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+------
 
 ## Contributing
 
