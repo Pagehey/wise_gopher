@@ -6,7 +6,7 @@ module WiseGopher
     attr_reader :name, :type
 
     def initialize(name, type_symbol, before_cast = nil)
-      @name        = name.to_s
+      @name        = name.to_s.freeze
       @type        = ActiveRecord::Type.lookup type_symbol
       @before_cast = before_cast&.to_proc
     end

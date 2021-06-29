@@ -6,8 +6,8 @@ module WiseGopher
     attr_reader :name, :type, :alias
 
     def initialize(name, type_symbol, after_cast: nil, as: nil)
-      @alias       = as&.to_s || name.to_s
-      @name        = name.to_s
+      @alias       = as&.to_s.freeze || name.to_s.freeze
+      @name        = name.to_s.freeze
       @type        = ActiveRecord::Type.lookup type_symbol
       @after_cast  = after_cast&.to_proc
     end
@@ -27,7 +27,7 @@ module WiseGopher
     end
 
     def instance_variable_name
-      @instance_variable_name ||= "@#{@alias.tr("?!", "")}".freeze
+      @instance_variable_name ||= "@#{@alias.tr("?!", "")}"
     end
 
     private
