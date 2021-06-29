@@ -16,7 +16,7 @@ RSpec.describe WiseGopher::Base do # rubocop:disable Metrics/BlockLength
 
     before { query_class.query query }
 
-    it "register the query sql" do
+    it "registers the query sql" do
       query_const = query_class::QUERY
 
       expect(query_const).to         eq(query)
@@ -33,7 +33,7 @@ RSpec.describe WiseGopher::Base do # rubocop:disable Metrics/BlockLength
 
     before { query_class.param(:title, :string) }
 
-    it "register a query param with the given arguments" do
+    it "registers a query param with the given arguments" do
       params_variable = query_class.instance_variable_get("@params")
 
       expect(params_variable.length).to                 eq(1)

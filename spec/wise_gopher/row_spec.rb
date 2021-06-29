@@ -1,59 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe WiseGopher::Row do # rubocop:disable Metrics/BlockLength
-  # describe "Row class" do
-  #   let(:query_class) do
-  #     query_class = Class.new(WiseGopher::Base) do
-  #       query <<-SQL
-  #         SELECT title FROM articles
-  #       SQL
-
-  #       row do
-  #         column :title, :stirng
-  #       end
-  #     end
-
-  #     stub_const("ArticleQuery", query_class)
-  #   end
-
-  #   it "is defined at query class creation" do
-  #     expect(defined? ArticleQuery::Row).to be_truthy
-  #   end
-  # end
-
-  # describe "Row instance" do
-  #   let(:query_class) do
-  #     query_class = Class.new(WiseGopher::Base) do
-  #       query <<-SQL
-  #         SELECT title, rating FROM articles
-  #       SQL
-
-  #       row do
-  #         column :title,  :string
-  #         column :rating, :integer
-  #       end
-  #     end
-
-  #     stub_const("ArticleQuery", query_class)
-  #   end
-
-  #   let(:row) { query_class.execute.first }
-
-  #   before do
-  #     # title, content, rating, published_at
-  #     create_article("Why someone can not simply walk into Mordor", "Beware of the Orcs!", 5, DateTime.new(1954, 7, 29))
-  #   end
-
-  #   it "be returned as result objects" do
-  #     expect(row).to be_a(ArticleQuery::Row)
-  #   end
-
-  #   it "has getter for each declared column" do
-  #     expect(row.title).to  eq("Why someone can not simply walk into Mordor")
-  #     expect(row.rating).to eq(5)
-  #   end
-  # end
-
   describe "::columns" do
     let(:row_class) do
       Class.new { include WiseGopher::Row }
