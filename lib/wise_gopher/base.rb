@@ -36,6 +36,8 @@ module WiseGopher
       end
 
       def execute
+        ensure_all_params_are_given
+
         new.execute
       end
 
@@ -51,7 +53,7 @@ module WiseGopher
         @row_class = const_set "Row", Class.new
       end
 
-      def ensure_all_params_are_given(inputs)
+      def ensure_all_params_are_given(inputs = {})
         missing_params = params.keys - inputs.keys.map(&:to_s)
 
         raise WiseGopher::ArgumentError, params.slice(*missing_params) if missing_params.any?

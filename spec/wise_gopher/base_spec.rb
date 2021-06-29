@@ -133,6 +133,31 @@ RSpec.describe WiseGopher::Base do
       end
     end
 
+    context "when params are required" do
+      let(:query_class) do
+        query_class = Class.new(described_class) do
+          query <<-SQL
+            SELECT title FROM articles
+            WHERE rating > {{ min_rating }}
+          SQL
+
+          param :min_rating, :integer
+
+          row do
+            column :title, :string
+          end
+        end
+
+        stub_const("ArticleQuery", query_class)
+      end
+
+      let(:result) { query_class.execute }
+
+      it "raises an error" do
+        expect { result }.to raise_error(WiseGopher::ArgumentError, /min_rating/)
+      end
+    end
+
     context "when result contains more columns than declared but column are ignored" do
       let(:query_class) do
         query_class = Class.new(described_class) do
