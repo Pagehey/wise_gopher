@@ -4,7 +4,7 @@ require_relative "lib/wise_gopher/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "wise_gopher"
-  spec.version       = WiseGopher::VERSION
+  spec.version       = WiseGopher::VERSION::STRING
   spec.authors       = ["PageHey"]
   spec.email         = ["pagehey@pm.me"]
 
