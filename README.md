@@ -217,6 +217,23 @@ end
 MyQuery.execute # => no error raised
 ```
 
+#### Array of value as parameter
+You can pass an array as parameter value. The will then make a comma separated list of placeholders and pass the arguments as many bind parameters.
+```ruby
+class MyQuery < WiseGopher::Base
+    query "SELECT title FROM articles WHERE rating in ({{ ratings }})"
+    
+    param :ratings, :integer
+    
+    row do
+        column :title, :string
+    end
+end
+
+MyQuery.execute_with(ratings: [1, 2])
+# query will be "SELECT title FROM articles WHERE rating in (1, 2)"
+```
+
 ------
 
 ## Contributing
