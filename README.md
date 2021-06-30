@@ -82,7 +82,7 @@ result.first.class
 
 ------
 
-So, basically what you need to do is make your class inherits from `WiseGopher::Base` and provide your SQL with `.query`. You can then declare what columns will be present in result with `.column` in a block given to `row`.
+So, basically what you need to do is make your class inherits from `WiseGopher::Base` and provide your SQL with `.query`. You can then declare what columns will be present in result with `.column` in a block given to `.row`.
 
 
 If your query doesn't need any parameter like this one:
@@ -130,14 +130,14 @@ To declare the column in result, you should use `.row` and pass it a block. Call
 The goal of this syntax is to gather in the same file the input and output logic of the query while keeping dedicated classes for each logic.
 You can provide a custom class to `.row` if you prefer. If you still pass the block to the method, the `WiseGopher::Row` module will be included in the class before evaluating it, so you can have this syntax:
 ```ruby
-_/my_custom_row.rb_
+# /my_custom_row.rb
 class MyCustomRow
     def some_custom_method
         # [...]
     end
 end
 
-_/my_query_class.rb
+# /my_query_class.rb
 class MyQueryClass < WiseGopher::Base
     query "SELECT title FROM articles"
     
