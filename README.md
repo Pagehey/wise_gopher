@@ -75,14 +75,14 @@ Which you would use this way:
 result = PopularArticle.execute_with(minimum_rating: 3, username: "PageHey ")
 # => [#<PopularArticle::Row:0x0000560c37e9de48 @title="My first gem is out!", @average_rating=3.5 ...>, ...]
 puts result.first
-# => Article 'My first gem is out!' by PageHey is rated 3.5/5.
+# => Article 'My first gem is out!' by PageHey is rated 3.50/5.
 result.first.class
 # => PopularArticle::Row
 ```
 
 ------
 
-So, basically what you need to do is make your class inherits from `WiseGopher::Base` and provide your SQL with `.query`. You can then declare what columns will be present in result with `.column` in a block given to `.row`.
+So, basically what you need to do is make your class inherits from `WiseGopher::Base` and provide your SQL with `query`. You can then declare what columns will be present in result with `column` in a block given to `row`.
 
 
 If your query doesn't need any parameter like this one:
@@ -95,7 +95,7 @@ class PopularArticle < WiseGopher::Base
     end
 end
 ```
-You can simply get result with `.execute`:
+You can simply get result with `execute`:
 ```ruby
 PopularArticle.execute
 ```
@@ -116,19 +116,19 @@ class PopularArticle < WiseGopher::Base
     end
 end
 ```
-You should declare the params with `.param` so you can pass the parameters as a hash to `.execute_with`:
+You should declare the params with `param` so you can pass the parameters as a hash to `execute_with`:
 ```ruby
 PopularArticle.execute_with(author_name: "PageHey", published_after: Date.today - 1.month)
 ```
 
-If any parameter is missing or if you call `.execute` for a class that needs some, it will raise `WiseGopher::ArgumentError`.
+If any parameter is missing or if you call `execute` for a class that needs some, it will raise `WiseGopher::ArgumentError`.
 
 Before query execution, the placeholders will be replaced with the standard `?` placeholder or with the `$1`, `$2` ... numbered placeholders for PostgreSQL database.
 
-To declare the column in result, you should use `.row` and pass it a block. Calling this method will create a `Row` class nested into your query class. The block will be then executed in `Row` class context. In this context you can use `.column` but also define method, include module, basicaly write any code you would find in a class delacration.
+To declare the column in result, you should use `row` and pass it a block. Calling this method will create a `Row` class nested into your query class. The block will be then executed in `Row` class context. In this context you can use `column` but also define method, include module, basicaly write any code you would find in a class delacration.
 
 The goal of this syntax is to gather in the same file the input and output logic of the query while keeping dedicated classes for each logic.
-You can provide a custom class to `.row` if you prefer. If you still pass the block to the method, the `WiseGopher::Row` module will be included in the class before evaluating it, so you can have this syntax:
+You can provide a custom class to `row` if you prefer. If you still pass the block to the method, the `WiseGopher::Row` module will be included in the class before evaluating it, so you can have this syntax:
 ```ruby
 # /my_custom_row.rb
 class MyCustomRow
@@ -147,13 +147,13 @@ class MyQueryClass < WiseGopher::Base
 end
 ```
 
-**If you don't give any block to `.row`, make sure you include `WiseGopher::Row` in your class.**
+**If you don't give any block to `row`, make sure you include `WiseGopher::Row` in your class.**
 
 
 ------
 ## Methods documentation
 ### WiseGopher::Base (class)
-#### .param
+#### ::param
 ```ruby
 param(name, type, transform: nil)
 ```
@@ -162,10 +162,10 @@ Argument | Required | Descrition
 ------------ | ------------- | ------------- 
 name | true | The name of the parameter as written in the `{{ placeholder }}`
 type | true | The type of the column. It can be any type registred as ActiveRecord::Type. Including yours
-transform: | false | `Proc` or `Symbol`. An operation that will be call before creating the bind parameter when you call `.execute_with`.
+transform: | false | `Proc` or `Symbol`. An operation that will be call before creating the bind parameter when you call `execute_with`.
 
 ###  WiseGopher::Row (module)
-#### .column
+#### ::column
 ```ruby
 column(name, type, transform: nil, as: nil)
 ```
@@ -180,10 +180,10 @@ as: | false | The name of the getter you want on the row instance for this colum
 ------
 ## Tips
 #### transform: argument as proc
-If you provide a proc to the `transform:` argument (either on `.column` or `.param`), you can expect one argument or none. If one argument is expected the value of the param or column will be passed.
+If you provide a proc to the `transform:` argument (either on `column` or `param`), you can expect one argument or none. If one argument is expected the value of the param or column will be passed.
 
 #### Prepare query for later execution
-You can prepare the query with param without executing it by simply calling `.new` on your class and providing the params an later call `.execute`.
+You can prepare the query with param without executing it by simply calling `new` on your class and providing the params an later call `execute`.
 ```ruby
 class PopularArticle < WiseGopher::Base
     query <<-SQL
@@ -203,7 +203,7 @@ last_month_articles.execute # => [#<PopularArticle::Row:0x0000560c37e9de48 ...>]
 ```
 
 #### Ignore column in result
-If for some reason, you have a column in your result that you don't want to retrieve on the row instances, you can use `.ignore`.
+If for some reason, you have a column in your result that you don't want to retrieve on the row instances, you can use `ignore`.
 ```ruby
 class MyQuery < WiseGopher::Base
     query "SELECT title, rating FROM articles"
