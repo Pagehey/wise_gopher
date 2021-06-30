@@ -50,7 +50,7 @@ class PopularArticle < WiseGopher::Base
     INNER JOIN ratings ON ratings.article_id = articles.id
     WHERE author_username = {{ username }}
     GROUP BY articles.id
-    HAVING average_rating > {{ mininum_rating }}
+    HAVING AVG(ratings.stars) > {{ mininum_rating }}
     ORDER BY averating_rating
   SQL
   
