@@ -63,12 +63,3 @@ module WiseGopher
   class RowClassNeedsRowModule < Error
   end
 end
-
-# connection;
-# class Query < WiseGopher::Base
-#   query "SELECT title, rating FROM articles"
-
-#   row do
-#     column :title, :string
-#   end
-# end; Query.execute
