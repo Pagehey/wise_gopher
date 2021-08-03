@@ -11,7 +11,8 @@ module WiseGopher
 
     def initialize(params)
       @params = params.map do |name, param|
-        "- \"#{name}\" (#{param.type.type})"
+        param_type = param.respond_to?(:type) ? param.type.type : :raw_param
+        "- \"#{name}\" (#{param_type})"
       end.join("\n")
     end
 
@@ -61,5 +62,18 @@ module WiseGopher
 
   # raised when custom row class is given but doesn't include WiseGopher::Row
   class RowClassNeedsRowModule < Error
+  end
+
+  # raised when param are raw_param are declared with the same name
+  class ParamAlreadyDeclared < Error
+    attr_reader :param_name
+
+    def initialize(param_name)
+      @param_name = param_name
+    end
+
+    def message
+      "'#{param_name}' is already declared either as 'raw_param' or standard 'param'."
+    end
   end
 end

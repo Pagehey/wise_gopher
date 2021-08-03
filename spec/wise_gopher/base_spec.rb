@@ -2,6 +2,8 @@
 
 # rubocop:disable Metrics/BlockLength
 
+require "pry-byebug"
+
 RSpec.describe WiseGopher::Base do
   describe "::query" do
     let(:query) do
@@ -42,6 +44,47 @@ RSpec.describe WiseGopher::Base do
       expect(params_variable.values.first).to           be_a(WiseGopher::Param)
       expect(params_variable.values.first.name).to      eq("title")
       expect(params_variable.values.first.type.type).to eq(:string)
+    end
+
+    context "when another param has the same name" do
+      it "raises an error" do
+        expect do
+          query_class.raw_param(:title)
+        end.to raise_error(WiseGopher::ParamAlreadyDeclared, /title/)
+      end
+    end
+  end
+
+  describe "::raw_param" do
+    let(:query) do
+      <<-SQL
+        SELECT title, rating FROM articles
+        {{ condition }}
+      SQL
+    end
+
+    let(:query_class) do
+      query_class = Class.new(described_class)
+
+      stub_const("ArticleQuery", query_class)
+    end
+
+    before { query_class.raw_param(:condition) }
+
+    it "registers a raw sql parameter" do
+      raw_params_variable = query_class.instance_variable_get("@raw_params")
+
+      expect(raw_params_variable.length).to            eq(1)
+      expect(raw_params_variable.values.first).to      be_a(WiseGopher::RawParam)
+      expect(raw_params_variable.values.first.name).to eq("condition")
+    end
+
+    context "when a standard param has the same name" do
+      it "raises an error" do
+        expect do
+          query_class.raw_param(:condition)
+        end.to raise_error(WiseGopher::ParamAlreadyDeclared, /condition/)
+      end
     end
   end
 
@@ -269,10 +312,13 @@ RSpec.describe WiseGopher::Base do
     end
 
     context "when inputs are missing" do
-      let(:result) { query_class.execute_with({}) }
+      let(:result) do
+        query_class.raw_param :condition
+        query_class.execute_with({})
+      end
 
       it "raises an error" do
-        expect { result }.to raise_error(WiseGopher::ArgumentError, /title/)
+        expect { result }.to raise_error(WiseGopher::ArgumentError, /title.*condition/m)
       end
     end
 
@@ -302,12 +348,6 @@ RSpec.describe WiseGopher::Base do
   describe ".prepare_query" do
     let(:query_class) do
       query_class = Class.new(described_class) do
-        query <<-SQL
-          SELECT title, rating FROM articles
-          WHERE title = {{ title }}
-          AND id IN ({{ id }})
-        SQL
-
         param :title, :string
         param :id,    :integer
       end
@@ -320,6 +360,14 @@ RSpec.describe WiseGopher::Base do
         title: "Potatoes can produce more energy than nuclear fission!",
         id:    [1, 2]
       )
+    end
+
+    before do
+      query_class.query <<-SQL
+        SELECT title, rating FROM articles
+        WHERE title = {{ title }}
+        AND id IN ({{ id }})
+      SQL
     end
 
     context "when RDBMS is PostgreSQL" do
@@ -350,6 +398,43 @@ RSpec.describe WiseGopher::Base do
           SELECT title, rating FROM articles
           WHERE title = ?
           AND id IN (?, ?)
+        SQL
+      end
+    end
+
+    context "when raw_params are declared" do
+      let(:query_instance) do
+        query_class.new(
+          title:     "Potatoes can produce more energy than nuclear fission!",
+          id:        [1, 2],
+          select:    "id",
+          condition: "id > 10",
+        )
+      end
+
+      before do
+        stub_const("ArticleQuery::QUERY", <<-SQL)
+          SELECT {{ select }} title, rating FROM articles
+          WHERE title = {{ title }}
+          AND id IN ({{ id }})
+          {{ condition }}
+          {{ order_by }}
+        SQL
+
+        query_class.raw_param :select,    suffix: ", "
+        query_class.raw_param :condition, prefix: " AND "
+        query_class.raw_param :order_by,  default: " ORDER BY id ASC"
+      end
+
+      it "replace placeholders for raw_params with given strings" do
+        query = query_instance.instance_variable_get("@query")
+
+        expect(query.squish).to eq(<<-SQL.squish)
+          SELECT id, title, rating FROM articles
+          WHERE title = ?
+          AND id IN (?, ?)
+          AND id > 10
+          ORDER BY id ASC
         SQL
       end
     end
