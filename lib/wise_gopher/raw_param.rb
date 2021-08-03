@@ -28,8 +28,5 @@ module WiseGopher
     def optional?
       optional || !!default
     end
-
-    def content
-    end
   end
 end
