@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
+
 RSpec.describe WiseGopher::RawParam do
   describe "#to_s" do
     context "when argument is needed" do
@@ -51,7 +53,9 @@ RSpec.describe WiseGopher::RawParam do
       end
 
       context "when optional is true" do
-        let(:raw_param) { described_class.new(:condition, optional: true, prefix: "don't add me", suffix: "me neither") }
+        let(:raw_param) do
+          described_class.new(:condition, optional: true, prefix: "don't add me", suffix: "me neither")
+        end
 
         it "returns the correct string to interpolate" do
           expect(result).to eq("")
@@ -60,3 +64,5 @@ RSpec.describe WiseGopher::RawParam do
     end
   end
 end
+
+# rubocop:enable Metrics/BlockLength

@@ -77,7 +77,7 @@ module WiseGopher
       end
 
       def required_params
-        params.merge raw_params.reject { |_name, raw_param| raw_param.optional? }
+        params.merge(raw_params.reject { |_name, raw_param| raw_param.optional? })
       end
     end
 

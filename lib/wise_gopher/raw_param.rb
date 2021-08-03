@@ -14,7 +14,7 @@ module WiseGopher
     end
 
     def to_s(string = nil)
-      raise ::ArgumentError, 'value required' unless string || optional?
+      raise ::ArgumentError, "value required" unless string || optional?
 
       content = string || default
 

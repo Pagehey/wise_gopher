@@ -408,7 +408,7 @@ RSpec.describe WiseGopher::Base do
           title:     "Potatoes can produce more energy than nuclear fission!",
           id:        [1, 2],
           select:    "id",
-          condition: "id > 10",
+          condition: "id > 10"
         )
       end
 
