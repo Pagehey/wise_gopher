@@ -239,6 +239,19 @@ name | true | The name of the parameter as written in the `{{ placeholder }}`
 type | true | The type of the column. It can be any type registred as ActiveRecord::Type. Including yours
 transform: | false | `Proc` or `Symbol`. An operation that will be call before creating the bind parameter when you call `execute_with`.
 
+#### ::raw_param
+```ruby
+raw_param(name, prefix: nil, suffix: nil, default: nil, optional: false)
+```
+
+Argument | Required | Descrition
+------------ | ------------- | ------------- 
+name | true | The name of the parameter as written in the `{{ placeholder }}`
+prefix: | false | The string to be inserted **before** the value passed as argument. No spaces will be added around to allow maximum customization.
+suffix: | false | The string to be inserted **after** the value passed as argument. No spaces will be added around to allow maximum customization.
+default: | false | The default value used if none is passed when calling the query
+optional: | false | an empty string will be inserted in place of the placeholder if neither argument or default is provided.
+
 ###  WiseGopher::Row (module)
 #### ::column
 ```ruby
