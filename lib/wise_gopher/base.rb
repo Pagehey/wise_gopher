@@ -7,7 +7,8 @@ module WiseGopher
   class Base
     def self.inherited(base)
       base.class_eval do
-        @params = {}
+        @raw_params = {}
+        @params     = {}
       end
       base.include Methods
       base.extend  ClassMethods
@@ -15,16 +16,26 @@ module WiseGopher
 
     # class methods for WiseGopher::Base
     module ClassMethods
-      attr_reader :row_class, :params
+      attr_reader :row_class, :params, :raw_params
 
       def query(query)
         const_set "QUERY", query.freeze
       end
 
       def param(name, type, transform = nil)
-        param = WiseGopher::Param.new(name, type, transform)
+        new_param = WiseGopher::Param.new(name, type, transform)
 
-        params[param.name] = param
+        ensure_param_name_is_available(new_param.name)
+
+        params[new_param.name] = new_param
+      end
+
+      def raw_param(name, **kwargs)
+        raw_param = WiseGopher::RawParam.new(name, **kwargs)
+
+        ensure_param_name_is_available(raw_param.name)
+
+        raw_params[raw_param.name] = raw_param
       end
 
       def row(base = nil, &block)
@@ -47,16 +58,26 @@ module WiseGopher
         new(inputs).execute
       end
 
+      def ensure_all_params_are_given(inputs = {})
+        missing_params = required_params.keys - inputs.keys.map(&:to_s)
+
+        raise WiseGopher::ArgumentError, required_params.slice(*missing_params) if missing_params.any?
+      end
+
       private
 
       def define_generic_row_class
         @row_class = const_set "Row", Class.new
       end
 
-      def ensure_all_params_are_given(inputs = {})
-        missing_params = params.keys - inputs.keys.map(&:to_s)
+      def ensure_param_name_is_available(name)
+        return unless params[name] || raw_params[name]
 
-        raise WiseGopher::ArgumentError, params.slice(*missing_params) if missing_params.any?
+        raise WiseGopher::ParamAlreadyDeclared, name
+      end
+
+      def required_params
+        params.merge(raw_params.reject { |_name, raw_param| raw_param.optional? })
       end
     end
 
@@ -72,13 +93,15 @@ module WiseGopher
         @bind_symbol    = WiseGopher.postgresql? ? +"$1" : "?"
         @query_prepared = false
 
+        self.class.ensure_all_params_are_given(inputs)
+
         prepare_query
       end
 
       def execute
         ensure_row_class_is_declared
 
-        result = connection.exec_query(@query.squish, query_class.to_s, @binds, prepare: true)
+        result = connection.exec_query(query.squish, query_class.to_s, @binds, prepare: true)
 
         ensure_all_columns_are_declared(result)
 
@@ -88,22 +111,30 @@ module WiseGopher
       def prepare_query
         return if @query_prepared
 
-        @query = query_class::QUERY.dup
+        prepare_raw_params
 
-        query_class.params.each do |name, param|
-          name  = name.to_sym
-          value = @inputs[name]
-
-          bind_params(value, param)
-        end
+        prepare_params
 
         @query_prepared = true
       end
 
       private
 
+      def prepare_params
+        query_class.params.each do |name, param|
+          name  = name.to_sym
+          value = @inputs[name]
+
+          bind_params(value, param)
+        end
+      end
+
       def query_class
         self.class
+      end
+
+      def query
+        @query ||= query_class::QUERY.dup
       end
 
       def bind_params(value, param)
@@ -117,19 +148,19 @@ module WiseGopher
       def bind_collection_param(values, param)
         bindings = values.map { use_bind_symbol }
 
-        replace_binding_placeholder(param.name, bindings.join(", "))
+        replace_placeholder(param.name, bindings.join(", "))
 
         values.each { |value| register_binding(value, param) }
       end
 
       def bind_single_param(value, param)
-        replace_binding_placeholder(param.name, use_bind_symbol)
+        replace_placeholder(param.name, use_bind_symbol)
 
         register_binding(value, param)
       end
 
-      def replace_binding_placeholder(name, binding_symbol)
-        @query.gsub!(/{{ ?#{name} ?}}/, binding_symbol)
+      def replace_placeholder(name, value_to_insert)
+        query.gsub!(/{{ ?#{name} ?}}/, value_to_insert)
       end
 
       def register_binding(value, param)
@@ -160,6 +191,15 @@ module WiseGopher
 
       def connection
         ActiveRecord::Base.connection
+      end
+
+      def prepare_raw_params
+        query_class.raw_params.each do |name, param|
+          name  = name.to_sym
+          value = @inputs[name]
+
+          replace_placeholder(name, param.to_s(value))
+        end
       end
     end
   end

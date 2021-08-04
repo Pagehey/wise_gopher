@@ -127,7 +127,7 @@ Before query execution, the placeholders will be replaced with the standard `?` 
 
 To declare the column in result, you should use `row` and pass it a block. Calling this method will create a `Row` class nested into your query class. The block will be then executed in `Row` class context. In this context you can use `column` but also define method, include module, basicaly write any code you would find in a class delacration.
 
-The goal of this syntax is to gather in the same file the input and output logic of the query while keeping dedicated classes for each logic.
+The goal of this syntax is to gather in the same file the inputs and outputs of the query while keeping dedicated classes for each subject.
 You can provide a custom class to `row` if you prefer. If you still pass the block to the method, the `WiseGopher::Row` module will be included in the class before evaluating it, so you can have this syntax:
 ```ruby
 # /my_custom_row.rb
@@ -149,6 +149,81 @@ end
 
 **If you don't give any block to `row`, make sure you include `WiseGopher::Row` in your class.**
 
+------
+## Raw params
+If you need to dinamically interpolate raw SQL in your query, you can use `raw_param`. The value passed with `execute_with` will be interpolated in the base query before inserting the other params.
+```ruby
+class AnnualReport < WiseGopher::Base
+    query <<-SQL
+        SELECT month, revenue
+        FROM heavy_computations
+        WHERE employee_id = {{ id }}
+        {{ order_by }}
+    SQL
+    
+    param :id, :integer
+    
+    raw_param :order_by
+end
+
+AnnualReport.execute_with(id: 1, order_by: "ORDER BY id ASC")
+```
+executed query will look like this:
+```SQL
+SELECT month, revenue
+FROM heavy_computations
+WHERE employee_id = ?
+ORDER BY id ASC
+```
+By default, `raw_param` is required but you can pass `optional: true`. You can then omit the param and the placeholder will be remove for this query instance.
+```ruby
+AnnualReport.execute_with(id: 1, order_by: "ORDER BY id ASC")
+```
+```SQL
+SELECT month, revenue
+FROM heavy_computations
+WHERE employee_id = ?
+```
+
+You can also provide _prefix_ and/or _suffix_ to `raw_param` to make the `raw_param` clearer and the argument lighter.
+```ruby
+class AnnualReport < WiseGopher::Base
+    query <<-SQL
+        SELECT month, revenue
+        FROM heavy_computations
+        WHERE employee_id = {{ id }}
+        {{ order_by }}
+    SQL
+    
+    param :id, :integer
+    
+    raw_param :order_by, prefix: "ORDER BY ", suffix: " ASC" # note the spacings
+end
+AnnualReport.execute_with(id: 1, order_by: "id")
+```
+Finally, a default option is also supported, thus making the param optional:
+```ruby
+class AnnualReport < WiseGopher::Base
+    query <<-SQL
+        SELECT month, revenue
+        FROM heavy_computations
+        WHERE employee_id = {{ id }}
+        {{ order_by }}
+    SQL
+    
+    param :id, :integer
+    
+    raw_param :order_by, prefix: " ORDER BY ", suffix: " ASC ", default: "id"
+end
+AnnualReport.execute_with(id: 1)
+```
+executed query:
+```SQL
+SELECT month, revenue
+FROM heavy_computations
+WHERE employee_id = ?
+ORDER BY id ASC
+```
 
 ------
 ## Methods documentation
@@ -163,6 +238,19 @@ Argument | Required | Descrition
 name | true | The name of the parameter as written in the `{{ placeholder }}`
 type | true | The type of the column. It can be any type registred as ActiveRecord::Type. Including yours
 transform: | false | `Proc` or `Symbol`. An operation that will be call before creating the bind parameter when you call `execute_with`.
+
+#### ::raw_param
+```ruby
+raw_param(name, prefix: nil, suffix: nil, default: nil, optional: false)
+```
+
+Argument | Required | Descrition
+------------ | ------------- | ------------- 
+name | true | The name of the parameter as written in the `{{ placeholder }}`
+prefix: | false | The string to be inserted **before** the value passed as argument. No spaces will be added around to allow maximum customization.
+suffix: | false | The string to be inserted **after** the value passed as argument. No spaces will be added around to allow maximum customization.
+default: | false | The default value used if none is passed when calling the query
+optional: | false | an empty string will be inserted in place of the placeholder if neither argument or default is provided.
 
 ###  WiseGopher::Row (module)
 #### ::column
@@ -232,6 +320,28 @@ end
 
 MyQuery.execute_with(ratings: [1, 2])
 # query will be "SELECT title FROM articles WHERE rating in (?, ?)"
+```
+
+#### Classic param in raw_param
+As the raw_params are interpolated before the classic params, you can have placeholders in them:
+```ruby
+class MyQuery < WiseGopher::Base
+    query <<-SQL
+        SELECT title FROM articles
+        WHERE rating > ({{ ratings }})"
+    SQL
+    
+    param :min_rating, :integer
+    
+    raw_param :or_condition, prefix: " OR "
+    
+    row do
+        column :title, :string
+    end
+end
+
+MyQuery.execute_with(min_rating: 1, or_condition: "rating = {{ min_rating }}")
+# query will be "SELECT title FROM articles WHERE rating > ? OR rating = ?"
 ```
 
 ------
