@@ -127,7 +127,7 @@ Before query execution, the placeholders will be replaced with the standard `?` 
 
 To declare the column in result, you should use `row` and pass it a block. Calling this method will create a `Row` class nested into your query class. The block will be then executed in `Row` class context. In this context you can use `column` but also define method, include module, basicaly write any code you would find in a class delacration.
 
-The goal of this syntax is to gather in the same file the input and output logic of the query while keeping dedicated classes for each logic.
+The goal of this syntax is to gather in the same file the inputs and outputs of the query while keeping dedicated classes for each subject.
 You can provide a custom class to `row` if you prefer. If you still pass the block to the method, the `WiseGopher::Row` module will be included in the class before evaluating it, so you can have this syntax:
 ```ruby
 # /my_custom_row.rb
