@@ -111,9 +111,9 @@ module WiseGopher
       def prepare_query
         return if @query_prepared
 
-        prepare_params
-
         prepare_raw_params
+
+        prepare_params
 
         @query_prepared = true
       end
