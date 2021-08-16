@@ -61,7 +61,7 @@ class PopularArticle < WiseGopher::Base
     column :title, :string, transform: :capitalize
     column :average_rating, :float, transform: -> { round(2) }
     column :published_at, :datetime
-    column :author_username, as: :author
+    column :author_username, :string, as: :author
     
     def to_s
         "Article '#{title}' by #{author} is rated #{"%.2f" % average_rating}/5."
