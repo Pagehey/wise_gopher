@@ -59,7 +59,7 @@ class PopularArticle < WiseGopher::Base
   
   row do
     column :title, :string, transform: :capitalize
-    column :average_rating, :float, -> { round(2) }
+    column :average_rating, :float, transform: -> { round(2) }
     column :published_at, :datetime
     column :author_username, as: :author
     
