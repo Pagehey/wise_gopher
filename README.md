@@ -151,7 +151,7 @@ end
 
 ------
 ## Raw params
-If you need to dinamically interpolate raw SQL in your query, you can use `raw_param`. The value passed with `execute_with` will be interpolated in the base query before inserting the other params.
+If you need to dynamically interpolate raw SQL in your query, you can use `raw_param`. The value passed with `execute_with` will be interpolated in the base query before inserting the other params.
 ```ruby
 class AnnualReport < WiseGopher::Base
     query <<-SQL
