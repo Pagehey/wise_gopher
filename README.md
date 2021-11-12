@@ -9,7 +9,7 @@ This gem tries to solve some problems found when you need to execute custom and/
 3. The column types are not always correctly retrieved by ActiveRecord, or sometimes you need a little more ruby treatment on the value before using it.
 
 [This article](https://blog.saeloun.com/2019/10/28/bind-parameters-in-activerecord-sql-queries.html) describe the benefits of using bind parameters with ActiveRecord.
-[This one](https://use-the-index-luke.com/sql/where-clause/bind-parameters) goes further one the subject.
+[This one](https://use-the-index-luke.com/sql/where-clause/bind-parameters) goes further on the subject.
 
 The basic idea of this gem is to provide you a way to declare what your query needs as input, what columns it returns and their type. In returns it will allow you to retrieve the rows from result as an array of plain Ruby objects. It will also dynamically creates a class for the row objects that you can customize or can provide it yourself.
 
