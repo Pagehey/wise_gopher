@@ -5,13 +5,19 @@ require "forwardable"
 module WiseGopher
   # Main inteface of the gem. Class to be inherited by the query class
   class Base
-    def self.inherited(base)
-      base.class_eval do
-        @raw_params = {}
-        @params     = {}
+    def self.inherited(child_class)
+      parent_class = self
+      child_class.extend ClassMethods
+      child_class.set_defaults
+
+      # if child_class is already a WiseGopher::Base
+      child_class.ancestors.include?(Methods) && child_class.class_eval do
+        @raw_params = parent_class.raw_params.deep_dup
+        @params = parent_class.params.deep_dup
+        @row_class = parent_class.row_class
       end
-      base.include Methods
-      base.extend  ClassMethods
+
+      child_class.include Methods
     end
 
     # class methods for WiseGopher::Base
@@ -41,7 +47,7 @@ module WiseGopher
       def row(base = nil, &block)
         @row_class ||= base || define_generic_row_class
 
-        @row_class.include WiseGopher::Row
+        @row_class.include WiseGopher::Row unless @row_class.ancestors.include?(WiseGopher::Row)
 
         @row_class.class_eval(&block) if block_given?
       end
@@ -62,6 +68,11 @@ module WiseGopher
         missing_params = required_params.keys - inputs.keys.map(&:to_s)
 
         raise WiseGopher::ArgumentError, required_params.slice(*missing_params) if missing_params.any?
+      end
+
+      def set_defaults
+        @raw_params = {}
+        @params = {}
       end
 
       private

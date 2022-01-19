@@ -1,18 +1,18 @@
 PATH
   remote: .
   specs:
-    wise_gopher (0.2.0)
+    wise_gopher (0.2.1)
       activerecord (>= 5, < 7)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (6.1.4)
-      activesupport (= 6.1.4)
-    activerecord (6.1.4)
-      activemodel (= 6.1.4)
-      activesupport (= 6.1.4)
-    activesupport (6.1.4)
+    activemodel (6.1.4.1)
+      activesupport (= 6.1.4.1)
+    activerecord (6.1.4.1)
+      activemodel (= 6.1.4.1)
+      activesupport (= 6.1.4.1)
+    activesupport (6.1.4.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -79,9 +79,10 @@ GEM
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.0.0)
     yard (0.9.26)
-    zeitwerk (2.4.2)
+    zeitwerk (2.5.1)
 
 PLATFORMS
+  x86_64-darwin-21
   x86_64-linux
 
 DEPENDENCIES
@@ -98,4 +99,4 @@ DEPENDENCIES
   wise_gopher!
 
 BUNDLED WITH
-   2.2.20
+   2.2.22
