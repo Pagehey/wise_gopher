@@ -439,6 +439,110 @@ RSpec.describe WiseGopher::Base do
       end
     end
   end
+
+  describe "inheritance" do
+    let(:parent_class_query) do
+      <<-SQL
+        SELECT id, title, rating FROM articles
+        WHERE title LIKE {{ title }}
+        AND id IN ({{ ids }})
+        ORDER BY id ASC
+      SQL
+    end
+
+    let(:child_class_query) do
+      <<-SQL
+        SELECT id, rating FROM articles
+        WHERE title LIKE {{ title }}
+        AND id IN ({{ ids }})
+        ORDER BY id DESC
+      SQL
+    end
+
+    before do
+      q = parent_class_query
+      klass = Class.new(described_class) do
+        query q
+
+        param :title, :string
+        param :ids, :integer
+
+        row do
+          column :id, :integer
+          column :title, :string
+          column :rating, :integer
+        end
+      end
+      stub_const("ParentClass", klass)
+
+      q = child_class_query
+      klass = Class.new(ParentClass) { query q }
+      stub_const("ChildClass", klass)
+
+      create_article("My first article", "Some stuff about SQL", 3, DateTime.new(2021, 7, 26))
+      create_article("My second article", "Some stuff about JS", 4, DateTime.new(1954, 7, 29))
+    end
+
+    it "inherits of row class" do
+      expect(ChildClass.row_class).to eq(ParentClass.row_class)
+      expect(ChildClass::QUERY).not_to eq(ParentClass::QUERY)
+    end
+
+    it "duplicates the params" do
+      child_params = ChildClass.instance_variable_get("@params")
+      parent_params = ParentClass.instance_variable_get("@params")
+
+      expect(child_params.keys).to eq(parent_params.keys)
+      expect(child_params.object_id).not_to eq(parent_params.object_id)
+    end
+
+    it "executes its own query" do
+      parent_result = ParentClass.execute_with(ids: [1, 2], title: "%article")
+      child_result = ChildClass.execute_with(ids: [1, 2], title: "%article")
+
+      expect(parent_result.map(&:id)).to eq([1, 2])
+      expect(child_result.map(&:id)).to eq([2, 1])
+    end
+
+    context "when child class has some different params" do
+      let(:child_class_query) do
+        <<-SQL
+          SELECT id, rating FROM articles
+          WHERE id IN ({{ ids }})
+          AND rating > {{ rating }}
+          ORDER BY id DESC
+        SQL
+      end
+
+      before do
+        q = child_class_query
+        klass = Class.new(ParentClass) do
+          query q
+
+          @params.delete("title")
+
+          param :rating, :integer
+        end
+        stub_const("ChildClass", klass)
+      end
+
+      it "removes one of the param without affecting the parent class" do
+        child_params = ChildClass.instance_variable_get("@params")
+        parent_params = ParentClass.instance_variable_get("@params")
+
+        expect(child_params.keys).to eq(%w[ids rating])
+        expect(parent_params.keys).to eq(%w[title ids])
+      end
+
+      it "executes its own query without error" do
+        parent_result = ParentClass.execute_with(ids: [1, 2], title: "%article")
+        child_result = ChildClass.execute_with(ids: [1, 2], rating: 3)
+
+        expect(parent_result.map(&:id)).to eq([1, 2])
+        expect(child_result.map(&:id)).to eq([2])
+      end
+    end
+  end
 end
 
 # rubocop:enable Metrics/BlockLength
