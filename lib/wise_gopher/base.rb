@@ -101,7 +101,6 @@ module WiseGopher
       def initialize(inputs = {})
         @inputs         = inputs
         @binds          = []
-        @bind_symbol    = WiseGopher.postgresql? ? +"$1" : "?"
         @query_prepared = false
 
         self.class.ensure_all_params_are_given(inputs)
@@ -180,14 +179,18 @@ module WiseGopher
 
       def use_bind_symbol
         if WiseGopher.postgresql?
-          symbol = @bind_symbol.dup
+          symbol = bind_symbol.dup
 
-          @bind_symbol.next!
+          bind_symbol.next!
 
           symbol
         else
-          @bind_symbol
+          bind_symbol
         end
+      end
+
+      def bind_symbol
+        @bind_symbol ||= WiseGopher.postgresql? ? +"$1" : "?"
       end
 
       def ensure_row_class_is_declared
