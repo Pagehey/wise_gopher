@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    wise_gopher (0.2.2)
+    wise_gopher (0.3.2)
       activerecord (~> 7, >= 5)
 
 GEM
