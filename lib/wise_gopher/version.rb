@@ -3,7 +3,7 @@
 module WiseGopher
   module VERSION
     MAJOR = 0
-    MINOR = 2
+    MINOR = 3
     PATCH = 2
 
     STRING = [MAJOR, MINOR, PATCH].join(".")
