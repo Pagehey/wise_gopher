@@ -328,7 +328,8 @@ As the raw_params are interpolated before the classic params, you can have place
 class MyQuery < WiseGopher::Base
     query <<-SQL
         SELECT title FROM articles
-        WHERE rating > ({{ ratings }})"
+        WHERE rating > {{ min_rating }}
+        {{ or_condition }}
     SQL
     
     param :min_rating, :integer
